@@ -46,7 +46,15 @@ bidscoin -t
 
 ## 2. Make a shortcut to your scratch space
 
-Your scratch space is at `/scratch5/<username>`. It's the best place to keep the working copy of your data. Typing the full path every time gets tedious, so set up a shortcut once.
+Your scratch space is at `/scratchN/<username>`, where **N is 3, 4, 5 or 6** depending on where it was set up. It's the best place to keep the working copy of your data. Typing the full path every time gets tedious, so set up a shortcut once.
+
+**First, find out which scratch you're on:**
+
+```bash
+ls -d /scratch*/$USER
+```
+
+This prints your scratch folder, e.g. `/scratch5/ab123456`. Use that path in the commands below. The examples use `/scratch5`; change the number if yours is different.
 
 **Option A: a link in your home folder (recommended)**
 
@@ -77,8 +85,8 @@ Notes:
 
 - You only need to do this once. The shortcut stays in place the next time you log in.
 - `$USER` is filled in with your username automatically. Don't replace it.
-- If `ls /scratch5/$USER` says *No such file or directory*, either your scratch space hasn't been approved yet or `/scratch5` isn't available on the machine you're logged in to.
-- Deleting the `~/scratch` link does **not** delete your data. To remove the link, use `rm ~/scratch` (no trailing `/`).
+- If `ls -d /scratch*/$USER` finds nothing, either your scratch space hasn't been approved yet or the scratch areas aren't available on the machine you're logged in to.
+- If you used the wrong number, remove the link with `rm ~/scratch` (no trailing `/`) and make it again. Removing the link does **not** delete your data.
 - Scratch space is for working data. Keep your original raw data and anything you can't regenerate backed up elsewhere.
 
 ---
@@ -235,7 +243,8 @@ Other CINN guides:
 
 ```bash
 # NoMachine terminal
-ln -s /scratch5/$USER ~/scratch          # once only: scratch shortcut
+ls -d /scratch*/$USER                    # find your scratch (3, 4, 5 or 6)
+ln -s /scratch5/$USER ~/scratch          # once only: use your number
 
 module load neurodesk-modules
 module load bidscoin
