@@ -19,7 +19,7 @@ Raw DICOMs ──► sourcedata/ (sorted by subject/session) ──► bidsmappe
 | Quick check with dcm2niix (optional) | NoMachine terminal | No |
 | `bidsmapper` / `bidseditor` | **NoMachine terminal** | **Yes** |
 | `bidscoiner` | NoMachine terminal | No |
-| Analysis (fMRIPrep, SPM, FSL …) | RACC2 | No |
+| Analysis (fMRIPrep, SPM, FSL …) | RACC | No |
 
 > **Tip:** All of the BIDS conversion can be done from the NoMachine terminal — you don't need to log in to RACC2 until you start your analysis. The BIDScoin editor needs a GUI, which is only supported on NoMachine.
 
