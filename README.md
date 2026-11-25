@@ -56,7 +56,7 @@ ls -d /scratch*/$USER
 
 This prints your scratch folder, e.g. `/scratch5/ab123456`. Use that path in the commands below. The examples use `/scratch5`; change the number if yours is different.
 
-**Option A: a link in your home folder (recommended)**
+**Make a link in your home folder**
 
 ```bash
 ln -s /scratch5/$USER ~/scratch
@@ -68,20 +68,6 @@ Now `~/scratch` points to your scratch space:
 cd ~/scratch
 ls ~/scratch
 ```
-
-**Option B: a variable and a `cd` shortcut**
-
-Run these commands once. They add a `SCRATCH` variable and a `cds` shortcut to the end of your `~/.bashrc`:
-
-```bash
-echo 'export SCRATCH=/scratch5/$USER' >> ~/.bashrc
-echo 'alias cds="cd $SCRATCH"' >> ~/.bashrc
-source ~/.bashrc
-```
-
-Now `cds` takes you to your scratch space, and you can use `$SCRATCH` in paths and scripts (e.g. `cp -r data $SCRATCH/`).
-
-Notes:
 
 - You only need to do this once. The shortcut stays in place the next time you log in.
 - `$USER` is filled in with your username automatically. Don't replace it.
