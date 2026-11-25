@@ -15,7 +15,7 @@ Raw DICOMs ──► sourcedata/ (sorted by subject/session) ──► bidsmappe
 
 | Step | Where to run | Needs a GUI? |
 |---|---|---|
-| Copy & organise raw data | NoMachine terminal | No |
+| Scratch shortcut, copy & organise raw data | NoMachine terminal | No |
 | Quick check with dcm2niix (optional) | NoMachine terminal | No |
 | `bidsmapper` / `bidseditor` | **NoMachine terminal** | **Yes** |
 | `bidscoiner` | NoMachine terminal | No |
@@ -44,22 +44,62 @@ bidscoin -t
 
 ---
 
-## 2. Copy your raw data to your working directory
+## 2. Make a shortcut to your scratch space
 
-Never work on the original copy of your scans. Copy them to your own working space first:
+Your scratch space is at `/scratch5/<username>`. It's the best place to keep the working copy of your data. Typing the full path every time gets tedious, so set up a shortcut once.
+
+**Option A: a link in your home folder (recommended)**
 
 ```bash
-cp -r <source_directory> <destination_directory>
+ln -s /scratch5/$USER ~/scratch
+```
+
+Now `~/scratch` points to your scratch space:
+
+```bash
+cd ~/scratch
+ls ~/scratch
+```
+
+**Option B: a variable and a `cd` shortcut**
+
+Run these commands once. They add a `SCRATCH` variable and a `cds` shortcut to the end of your `~/.bashrc`:
+
+```bash
+echo 'export SCRATCH=/scratch5/$USER' >> ~/.bashrc
+echo 'alias cds="cd $SCRATCH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Now `cds` takes you to your scratch space, and you can use `$SCRATCH` in paths and scripts (e.g. `cp -r data $SCRATCH/`).
+
+Notes:
+
+- You only need to do this once. The shortcut stays in place the next time you log in.
+- `$USER` is filled in with your username automatically. Don't replace it.
+- If `ls /scratch5/$USER` says *No such file or directory*, either your scratch space hasn't been approved yet or `/scratch5` isn't available on the machine you're logged in to.
+- Deleting the `~/scratch` link does **not** delete your data. To remove the link, use `rm ~/scratch` (no trailing `/`).
+- Scratch space is for working data. Keep your original raw data and anything you can't regenerate backed up elsewhere.
+
+---
+
+## 3. Copy your raw data to your scratch space
+
+Never work on the original copy of your scans. Copy them to your scratch space first:
+
+```bash
+mkdir -p ~/scratch/myproject/sourcedata
+cp -r <source_directory> ~/scratch/myproject/sourcedata/
 ```
 
 ---
 
-## 3. Organise the DICOMs into a `sourcedata` folder
+## 4. Organise the DICOMs into a `sourcedata` folder
 
 BIDScoin expects **one folder per subject**, optionally with **one folder per session** inside it, and the DICOMs underneath:
 
 ```
-myproject/
+~/scratch/myproject/
 ├── sourcedata/                  # raw DICOMs (input)
 │   ├── sub-001/
 │   │   ├── ses-01/
@@ -82,30 +122,30 @@ Notes:
 
 ---
 
-## 4. (Optional) Quick check with dcm2niix
+## 5. (Optional) Quick check with dcm2niix
 
-Before running BIDScoin, you can convert one session by hand to check the scans look right (BIDScoin runs dcm2niix itself in step 6, so this is only a sanity check):
+Before running BIDScoin, you can convert one session by hand to check the scans look right (BIDScoin runs dcm2niix itself in step 7, so this is only a sanity check):
 
 ```bash
-mkdir -p ~/dcm2niix_test
-dcm2niix -o ~/dcm2niix_test myproject/sourcedata/sub-001/ses-01
+mkdir -p ~/scratch/dcm2niix_test
+dcm2niix -o ~/scratch/dcm2niix_test ~/scratch/myproject/sourcedata/sub-001/ses-01
 ```
 
 Open the NIfTI files in FSLeyes to check them:
 
 ```bash
 module load fsl
-fsleyes ~/dcm2niix_test/*.nii.gz
+fsleyes ~/scratch/dcm2niix_test/*.nii.gz
 ```
 
 ---
 
-## 5. Map your scans: `bidsmapper` + `bidseditor`
+## 6. Map your scans: `bidsmapper` + `bidseditor`
 
 The bidsmapper scans your source data and works out which BIDS name each scan series should get. It then opens the **bidseditor** so you can check and fix the mapping.
 
 ```bash
-cd myproject
+cd ~/scratch/myproject
 bidsmapper sourcedata bids
 ```
 
@@ -126,7 +166,7 @@ bidseditor bids
 
 ---
 
-## 6. Convert: `bidscoiner`
+## 7. Convert: `bidscoiner`
 
 Convert all subjects using the saved bidsmap:
 
@@ -145,7 +185,7 @@ Useful options:
 
 ---
 
-## 7. Check the result
+## 8. Check the result
 
 Your `bids/` folder should now look something like this:
 
@@ -173,7 +213,7 @@ Then:
 
 ---
 
-## 8. Next steps
+## 9. Next steps
 
 Once your data are in BIDS, you can run your analysis on RACC2. Log in from the NoMachine terminal:
 
@@ -185,8 +225,9 @@ Other ways to log in: [RACC2 – Login and Interactive Computing](https://resear
 
 Other CINN guides:
 
-- [CINN_SPM](https://gitlab.act.reading.ac.uk/op936728/CINN_SPM) — SPM batch template (`module load spm26`)
-- [CINN_fsl_sub](https://gitlab.act.reading.ac.uk/op936728/CINN_fsl_sub) — running FSL jobs on RACC2 with `fsl_sub` (the RACC2 section is useful for any analysis)
+- [CINN_fmriprep](https://github.com/yuanqm822/CINN_fmriprep): running fMRIPrep and MRIQC on your BIDS data with the CINN modules
+- [CINN_SPM](https://github.com/yuanqm822/CINN_SPM): SPM batch template (`module load spm26`)
+- [CINN_fsl_sub](https://github.com/yuanqm822/CINN_fsl_sub): running FSL jobs on RACC2 with `fsl_sub` (the RACC2 section is useful for any analysis)
 
 ---
 
@@ -194,11 +235,14 @@ Other CINN guides:
 
 ```bash
 # NoMachine terminal
+ln -s /scratch5/$USER ~/scratch          # once only: scratch shortcut
+
 module load neurodesk-modules
 module load bidscoin
 
-cp -r <source_directory> myproject/sourcedata/
-cd myproject
+mkdir -p ~/scratch/myproject/sourcedata
+cp -r <source_directory> ~/scratch/myproject/sourcedata/
+cd ~/scratch/myproject
 bidsmapper sourcedata bids     # map scans + check in the GUI
 bidscoiner sourcedata bids     # convert to BIDS
 ```
